@@ -20,3 +20,4 @@ class Uma:
         self.pow = basePow
         self.guts = baseGuts
         self.wit = baseWit
+        uma.energy = 100
