@@ -18,6 +18,8 @@ def trainFacilitySucc(supports, fakeFaces, uma, facilityNum, facilityLevel):
     baseBonus = uma.bonusSpd
 
     total_friend_multiplier = 1.0
+    energy_recovery = 0
+    energy_cost_reduction = 1.0
 
     for support in supports:
         trainingEffect += support.trainingBonus
@@ -25,13 +27,15 @@ def trainFacilitySucc(supports, fakeFaces, uma, facilityNum, facilityLevel):
 
         if support.bond >= 80 and support.defaultFacility == facilityNum:
             total_friend_multiplier *= support.friendshipBonus
+            energy_recovery += support.energyBoost
+            energy_cost_reduction *= support.energyCostReduction
 
         # manages bond of supports only, does not influence stat calc
         support.trainWith(uma)
 
     total_mood_modifier = 1 + float(moodEffect * (100.0 + moodModifier) / 100)
 
-    total_multiplier = baseBonus * (1 + float(0.5 * (numSupports + fakeFaces))) * trainingEffect * total_friend_multipler * total_mood_modifier
+    total_multiplier = baseBonus * (1 + float(0.5 * (numSupports + fakeFaces))) * trainingEffect * total_friend_multiplier * total_mood_modifier
 
     uma.spd += baseSpdIncrease * total_multiplier
     uma.stm += baseStmIncrease * total_multiplier
@@ -40,5 +44,7 @@ def trainFacilitySucc(supports, fakeFaces, uma, facilityNum, facilityLevel):
     uma.wit += baseWitIncrease * total_multiplier
     uma.sp += baseSPIncrease * total_multiplier
 
-    uma.energy = max(0, uma.energy - BASE_ENERGY[facilityNum])
-    uma.energy = min(100, uma.energy) # prevent energy from overflowing when training on wit
+    if facilityNum < 4:
+        uma.energy = max(0, uma.energy - ((BASE_ENERGY[facilityNum] + (facilityLevel - 1)) * energy_cost_reduction))
+    else:
+        uma.energy = min(100, uma.energy + energy_recovery - BASE_ENERGY[facilityNum])

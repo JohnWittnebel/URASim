@@ -13,6 +13,7 @@ class Support:
         self.hintFreq = hintFreq
         self.prio = prio
         self.currBond = initialBond
+        self.energyBoost = 0
 
     def trainWith(self, uma):
         if uma.charming:
